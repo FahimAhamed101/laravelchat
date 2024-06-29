@@ -10,17 +10,16 @@
         <div class="wsus__message_paceholder d-none"></div>
 
         <div class="wsus__chat_area_header">
-            <div class="header_left">
+            <div class="header_left messenger-header">
                 <span class="back_to_list">
                     <i class="fas fa-arrow-left"></i>
                 </span>
-                <img src="images/author_img_2.jpg" alt="User" class="img-fluid">
-                <h4>Jubaydul islam</h4>
+                <img src="" alt="User" class="img-fluid">
+                <h4></h4>
             </div>
             <div class="header_right">
-                <a href="#" class="favourite"><i class="fas fa-star"></i></a>
-                <a href="#" class="go_home"><i class="fas fa-home"></i></a>
-                <a href="#" class="info"><i class="fas fa-info-circle"></i></a>
+                <a href="" class="favourite"><i class="fas fa-star"></i></a>
+                <a href="javascript:;" class="info"><i class="fas fa-info-circle"></i></a>
             </div>
         </div>
 
