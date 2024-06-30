@@ -1,12 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Events\Message as MessageEvent;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Message;
+use App\Traits\FileUploadTrait;
 class MessengerController extends Controller
 {
     public function index(): View
@@ -61,17 +63,19 @@ class MessengerController extends Controller
              // 'message' => ['required'],
              'id' => ['required', 'integer'],
              'temporaryMsgId' => ['required'],
-             'attachment' => ['nullable', 'max:1024', 'image']
+           
          ]);
  
          // store the message in DB
-         $attachmentPath = $this->uploadFile($request, 'attachment');
+      
+     
          $message = new Message();
          $message->from_id = Auth::user()->id;
          $message->to_id = $request->id;
          $message->body = $request->message;
-         if ($attachmentPath) $message->attachment = json_encode($attachmentPath);
+      
          $message->save();
+
  
          // broadcast event
          MessageEvent::dispatch($message);

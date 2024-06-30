@@ -9,17 +9,16 @@ var activeUsersIds = [];
 
 const messageForm = $(".message-form"),
     messageInput = $(".message-input"),
-    
     messageBoxContainer = $(".wsus__chat_area_body"),
     csrf_token = $("meta[name=csrf_token]").attr("content"),
     auth_id = $("meta[name=auth_id]").attr("content"),
-    url = $("meta[name=url]").attr("content")
-
+    url = $("meta[name=url]").attr("content"),
+    messengerContactBox = $(".messenger-contacts");
 
 const getMessengerId = () => $("meta[name=id]").attr("content");
 const setMessengerId = (id) => $("meta[name=id]").attr("content", id);
 
-console.log(getMessengerId)
+
 /**
  * -----------------------------------
  * Reusable Functions
@@ -36,18 +35,17 @@ function disableChatBoxLoader() {
     $(".wsus__message_paceholder_black").addClass('d-none');
 
 }
-function initVenobox() {
-    $('.venobox').venobox();
-}
 
 
 function imagePreview(input, selector) {
     if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            $(selector).attr('src', e.target.result);
-        };
-        reader.readAsDataURL(input.files[0]);
+        var render = new FileReader();
+
+        render.onload = function (e) {
+            $(selector).attr('src', e.target.result)
+        }
+
+        render.readAsDataURL(input.files[0]);
     }
 }
 
@@ -123,6 +121,13 @@ function debounce(callback, delay) {
         }, delay)
     }
 }
+
+/**
+ * ----------------------------------------------
+ * Fetch id data of user and update the view
+ * ----------------------------------------------
+ */
+
 function IDinfo(id) {
     $.ajax({
         method: 'GET',
@@ -165,28 +170,13 @@ function IDinfo(id) {
         }
     });
 }
-function updateSelectedContent(user_id) {
-    $('.messenger-list-item').removeClass('active');
-    $(`.messenger-list-item[data-id="${user_id}"]`).addClass('active');
-}
+
 /**
  * ----------------------------------------------
  * Send Message
  * ----------------------------------------------
  */
-function makeSeen(status) {
-    $(`.messenger-list-item[data-id="${getMessengerId()}"]`).find('.unseen_count').remove();
-    $.ajax({
-        method: "POST",
-        url: "/messenger/make-seen",
-        data: {
-            _token: csrf_token,
-            id: getMessengerId()
-        },
-        success: function () {},
-        error: function () {}
-    })
-}
+
 function sendMessage() {
     temporaryMsgId += 1;
     let tempID = `temp_${temporaryMsgId}`;
@@ -196,10 +186,9 @@ function sendMessage() {
     if (inputValue.length > 0 || hasAttachment) {
         const formData = new FormData($(".message-form")[0]);
         formData.append("id", getMessengerId());
-        console.log(formData)
         formData.append("temporaryMsgId", tempID);
         formData.append("_token", csrf_token);
-console.log(formData)
+
         $.ajax({
             method: "POST",
             url: "/messenger/send-message",
@@ -293,7 +282,6 @@ function messageFormReset() {
     $('.attachment-block').addClass('d-none');
 
     messageForm.trigger("reset");
-
     var emojiElt = $('#example1').emojioneArea();
     emojiElt.data("emojioneArea").setText('');
 }
@@ -303,16 +291,7 @@ function messageFormReset() {
  * Fetch messages from database
  * ----------------------------------------------
  */
-/**
- * ----------------------------------------------
- * Slide to bottom on action
- * ----------------------------------------------
- */
-function scrollToBottom(container) {
-    $(container).stop().animate({
-        scrollTop: $(container)[0].scrollHeight
-    });
-}
+
 let messagesPage = 1;
 let noMoreMessages = false;
 let messagesLoading = false;
@@ -378,14 +357,135 @@ function fetchMessages(id, newFetch = false) {
 }
 
 /**
- * --------------------------------------------------------------------------
- * On Dom Load Event
- * --------------------------------------------------------------------------
+ * ----------------------------------------------
+ * Fetch Contact list from database
+ * ----------------------------------------------
  */
 
-$(document).ready(function() {
 
- 
+
+
+/**
+ * ----------------------------------------------
+ * Make messages seen
+ * ----------------------------------------------
+ */
+function makeSeen(status) {
+    $(`.messenger-list-item[data-id="${getMessengerId()}"]`).find('.unseen_count').remove();
+    $.ajax({
+        method: "POST",
+        url: "/messenger/make-seen",
+        data: {
+            _token: csrf_token,
+            id: getMessengerId()
+        },
+        success: function () {},
+        error: function () {}
+    })
+}
+
+/**
+ * ----------------------------------------------
+ * Favorite
+ * ----------------------------------------------
+ */
+
+
+/**
+ * ----------------------------------------------
+ * Delete message
+ * ----------------------------------------------
+ */
+
+function deleteMessage(message_id) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                method: 'DELETE',
+                url: '/messenger/delete-message',
+                data: { _token: csrf_token, message_id: message_id },
+                beforeSend: function () {
+                    $(`.message-card[data-id="${message_id}"]`).remove();
+                },
+                success: function (data) {
+                    updateContactItem(getMessengerId());
+                },
+                error: function (xhr, status, error) { }
+            })
+        }
+    });
+}
+
+
+function updateSelectedContent(user_id) {
+    $('.messenger-list-item').removeClass('active');
+    $(`.messenger-list-item[data-id="${user_id}"]`).addClass('active');
+}
+
+/**
+ * ----------------------------------------------
+ * Slide to bottom on action
+ * ----------------------------------------------
+ */
+function scrollToBottom(container) {
+    $(container).stop().animate({
+        scrollTop: $(container)[0].scrollHeight
+    });
+}
+
+/**
+ * ----------------------------------------------
+ * initialize venobox.js
+ * ----------------------------------------------
+ */
+function initVenobox() {
+    $('.venobox').venobox();
+}
+
+/**
+ * ----------------------------------------------
+ * Play message sound
+ * ----------------------------------------------
+ */
+function playNotificationSound() {
+    const sound = new Audio(`/default/message-sound.mp3`);
+    sound.play();
+}
+
+
+
+
+
+
+
+
+/**
+ * -----------------------------------
+ * On Dom Load
+ * -----------------------------------
+ */
+
+$(document).ready(function () {
+
+
+    if (window.innerWidth < 768) {
+        $("body").on('click', '.messenger-list-item', function () {
+            $(".wsus__user_list").addClass('d-none');
+        });
+
+        $("body").on('click', '.back_to_list', function () {
+            $(".wsus__user_list").removeClass('d-none');
+        });
+    }
+
     $('#select_file').change(function () {
         imagePreview(this, '.profile-image-preview')
     });
@@ -409,8 +509,8 @@ $(document).ready(function() {
 
     })
 
-     // click action for messenger list item
-     $("body").on("click", ".messenger-list-item", function () {
+    // click action for messenger list item
+    $("body").on("click", ".messenger-list-item", function () {
         const dataId = $(this).attr("data-id");
         updateSelectedContent(dataId)
         setMessengerId(dataId);
@@ -440,7 +540,47 @@ $(document).ready(function() {
         fetchMessages(getMessengerId());
     }, true)
 
+    // Contacts pagination
+    actionOnScroll(".messenger-contacts", function () {
+        getContacts();
+    });
+
+    // add/remove to favorite
+    $(".favourite").on('click', function (e) {
+        e.preventDefault();
+        star(getMessengerId());
+    })
+
+    // delete message
+    $("body").on('click', '.dlt-message', function (e) {
+        e.preventDefault();
+        let id = $(this).data('id');
+        deleteMessage(id);
+    })
+
+
+
+    // custom hight adjustment
+    function adjustHeight() {
+        var windowHeight = $(window).height();
+        $('.wsus__chat_area_body').css('height', (windowHeight - 120) + 'px');
+        $('.messenger-contacts').css('max-height', (windowHeight - 393) + 'px');
+        $('.wsus__chat_info_gallery').css('max-height', (windowHeight - 400) + 'px');
+        $('.user_search_list_result').css({
+            'height': (windowHeight - 130) + 'px',
+        });
+    }
+
+    // Call the function initially
+    adjustHeight();
+
+    // Call the function whenever the window is resized
+    $(window).resize(function () {
+        adjustHeight();
+    });
+
 });
+
 
 
 

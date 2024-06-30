@@ -48,7 +48,7 @@
                     <img src="" alt="User" class="img-fluid attachment-preview">
                     <span class="cancel-attachment"><i class="far fa-times"></i></span>
                 </div>
-                <form action="#" class="message-form" >
+                <form action="#" class="message-form" enctype="multipart/form-data">
                     <div class="file">
                         <label for="file"><i class="far fa-plus"></i></label>
                         <input id="file" type="file" hidden class="attachment-input" name="attachment" accept="image/*">
