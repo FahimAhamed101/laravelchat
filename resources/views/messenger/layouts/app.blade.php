@@ -5,14 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densityDpi=device-dpi" />
-    <title>Chatting Application</title>
+    <title>Chatting Application laravel</title>
     <link rel="icon" type="image/png" href="images/favicon.png">
+    <meta name="id" content="">
+    <meta name="csrf_token" content="{{ csrf_token() }}">
+    <meta name="auth_id" content="{{ auth()->user()->id }}">
+    <meta name="url" content="{{ public_path() }}">
     <link rel="stylesheet" href="{{ asset('assets/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/slick.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/venobox.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/emojionearea.min.css') }}">
-
+    <link rel="stylesheet" href="https://unpkg.com/nprogress@0.2.0/nprogress.css">
     <link rel="stylesheet" href="{{ asset('assets/css/spacing.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/responsive.css') }}">
