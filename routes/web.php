@@ -28,7 +28,8 @@ Route::group(['middleware' => 'auth'], function() {
      Route::post('messenger/send-message', [MessengerController::class, 'sendMessage'])->name('messenger.send-message');
      // fetch message
      Route::post('messenger/make-seen', [MessengerController::class, 'makeSeen'])->name('messenger.make-seen');
-     Route::get('messenger/fetch-messages', [MessengerController::class, 'fetchMessages'])->name('messenger.fetch-messeges');
+        // fetch message
+    Route::get('messenger/fetch-messages', [MessengerController::class, 'fetchMessages'])->name('messenger.fetch-messeges');
 });
 
 

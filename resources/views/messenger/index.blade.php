@@ -1,13 +1,17 @@
 @extends('messenger.layouts.app')
 
 @section('contents')
-<section class="wsus__chat_app">
-    {{-- gọi file user-list-sidebar --}}
+<section class="wsus__chat_app show_info">
+
     @include('messenger.layouts.user-list-sidebar')
 
     <div class="wsus__chat_area">
 
         <div class="wsus__message_paceholder d-none"></div>
+        <div class="wsus__message_paceholder_black d-flex justify-content-center align-items-center">
+            <span class="select_a_user">Select a user for start convercetion</span>
+        </div>
+
 
         <div class="wsus__chat_area_header">
             <div class="header_left messenger-header">
@@ -25,21 +29,6 @@
 
         <div class="wsus__chat_area_body">
 
-            <div class="wsus__single_chat_area">
-                <div class="wsus__single_chat">
-                    <p class="messages">Hi, How are you ?</p>
-                    <span class="time"> 5h ago</span>
-                    <a class="action" href="#"><i class="fas fa-trash"></i></a>
-                </div>
-            </div>
-
-            <div class="wsus__single_chat_area">
-                <div class="wsus__single_chat chat_right">
-                    <p class="messages">I'm fine, What about you ?</p>
-                    <span class="time"> 5h ago</span>
-                    <a class="action" href="#"><i class="fas fa-trash"></i></a>
-                </div>
-            </div>
         </div>
 
         <div class="wsus__chat_area_footer">
