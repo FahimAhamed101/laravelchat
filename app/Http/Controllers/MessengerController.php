@@ -9,8 +9,11 @@ use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Message;
 use App\Traits\FileUploadTrait;
+
 class MessengerController extends Controller
 {
+
+    use FileUploadTrait;
     public function index(): View
     {
         return view('messenger.index');
@@ -57,34 +60,33 @@ class MessengerController extends Controller
 
         return true;
     }
-     function sendMessage(Request $request)
-     {
-         $request->validate([
-             // 'message' => ['required'],
-             'id' => ['required', 'integer'],
-             'temporaryMsgId' => ['required'],
-           
-         ]);
- 
-         // store the message in DB
-      
-     
-         $message = new Message();
-         $message->from_id = Auth::user()->id;
-         $message->to_id = $request->id;
-         $message->body = $request->message;
-      
-         $message->save();
+    function sendMessage(Request $request)
+    {   
+        $request->validate([
+            // 'message' => ['required'],
+            'id' => ['required', 'integer'],
+            'temporaryMsgId' => ['required'],
+            'attachment' => ['nullable', 'max:1024', 'image']
+        ]);
 
- 
-         // broadcast event
-         MessageEvent::dispatch($message);
- 
-         return response()->json([
-             'message' => $message->attachment ? $this->messageCard($message, true) : $this->messageCard($message),
-             'tempID' => $request->temporaryMsgId
-         ]);
-     }
+        // store the message in DB
+        $attachmentPath = $this->uploadFile($request, 'attachment');
+        
+        $message = new Message();
+        $message->from_id = Auth::user()->id;
+        $message->to_id = $request->id;
+        $message->body = $request->message;
+        if ($attachmentPath) $message->attachment = json_encode($attachmentPath);
+        $message->save();
+
+        // broadcast event
+        MessageEvent::dispatch($message);
+
+        return response()->json([
+            'message' => $message->attachment ? $this->messageCard($message, true) : $this->messageCard($message),
+            'tempID' => $request->temporaryMsgId
+        ]);
+    }
  
      function messageCard($message, $attachment = false)
      {
