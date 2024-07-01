@@ -362,8 +362,77 @@ function fetchMessages(id, newFetch = false) {
  * ----------------------------------------------
  */
 
+let contactsPage = 1;
+let noMoreContacts = false;
+let contactLoading = false;
 
+function getContacts() {
+    if (!contactLoading && !noMoreContacts) {
+        $.ajax({
+            method: "GET",
+            url: "messenger/fetch-contacts",
+            data: { page: contactsPage },
+            beforeSend: function () {
+                contactLoading = true;
+                let loader = `
+                <div class="text-center contact-loader">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                `;
+                messengerContactBox.append(loader)
+            },
+            success: function (data) {
+                contactLoading = false;
+                messengerContactBox.find(".contact-loader").remove();
+                if (contactsPage < 2) {
+                    messengerContactBox.html(data.contacts);
+                } else {
+                    messengerContactBox.append(data.contacts);
+                }
 
+                noMoreContacts = contactsPage >= data?.last_page;
+                if (!noMoreContacts) contactsPage += 1;
+
+                updateUserActiveList()
+            },
+            error: function (xhr, status, error) {
+                contactLoading = false;
+                messengerContactBox.find(".contact-loader").remove();
+            }
+        })
+    }
+}
+/**
+ * ----------------------------------------------
+ * Update contact item
+ * ----------------------------------------------
+ */
+
+function updateContactItem(user_id) {
+    if (user_id != auth_id) {
+        $.ajax({
+            method: "GET",
+            url: "/messenger/update-contact-item",
+            data: { user_id: user_id },
+            success: function (data) {
+                messengerContactBox.find('.no_contact').remove();
+                messengerContactBox.find(`.messenger-list-item[data-id="${user_id}"]`).remove();
+                messengerContactBox.prepend(data.contact_item);
+
+                if (activeUsersIds.includes(+user_id)) {
+                    userActive(user_id);
+                }
+
+                if (user_id == getMessengerId()) updateSelectedContent(user_id);
+            },
+            error: function (xhr, status, error) {
+
+            }
+        });
+    }
+}
 
 /**
  * ----------------------------------------------
@@ -466,7 +535,6 @@ function playNotificationSound() {
 
 
 
-
 /**
  * -----------------------------------
  * On Dom Load
@@ -475,6 +543,7 @@ function playNotificationSound() {
 
 $(document).ready(function () {
 
+    getContacts();
 
     if (window.innerWidth < 768) {
         $("body").on('click', '.messenger-list-item', function () {
@@ -580,7 +649,3 @@ $(document).ready(function () {
     });
 
 });
-
-
-
-
