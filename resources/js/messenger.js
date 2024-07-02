@@ -458,7 +458,28 @@ function makeSeen(status) {
  * Favorite
  * ----------------------------------------------
  */
+function star(user_id) {
+    $(".favourite").toggleClass('active');
 
+    $.ajax({
+        method: "POST",
+        url: "messenger/favorite",
+        data: {
+            _token: csrf_token,
+            id: user_id
+        },
+        success: function (data) {
+            if (data.status == 'added') {
+                notyf.success('Added to favorite list.');
+            } else {
+                notyf.success('Removed from favorite list.');
+            }
+        },
+        error: function (xhr, status, error) {
+
+        }
+    })
+}
 
 /**
  * ----------------------------------------------
@@ -510,6 +531,7 @@ function scrollToBottom(container) {
     });
 }
 
+
 /**
  * ----------------------------------------------
  * initialize venobox.js
@@ -518,20 +540,6 @@ function scrollToBottom(container) {
 function initVenobox() {
     $('.venobox').venobox();
 }
-
-/**
- * ----------------------------------------------
- * Play message sound
- * ----------------------------------------------
- */
-function playNotificationSound() {
-    const sound = new Audio(`/default/message-sound.mp3`);
-    sound.play();
-}
-
-
-
-
 
 
 

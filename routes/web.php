@@ -32,7 +32,9 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('messenger/fetch-messages', [MessengerController::class, 'fetchMessages'])->name('messenger.fetch-messeges');
  // fetch contacts
  Route::get('messenger/fetch-contacts', [MessengerController::class, 'fetchContacts'])->name('messenger.fetch-contacts');
-
+ // favorite routes
+ Route::post('messenger/favorite', [MessengerController::class, 'favorite'])->name('messenger.favorite');
+ Route::get('messenger/fetch-favorite', [MessengerController::class, 'fetchFavoritesList'])->name('messenger.fetch-favorite');
 
 });
 
